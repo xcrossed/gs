@@ -123,8 +123,9 @@ func remove(rootDir string) {
 	projectDir := path.Join(rootDir, prefix, project)
 	_ = os.RemoveAll(projectDir)
 
-	cmd := internal.NewCommand("ls", projectDir)
-	_, _ = cmd.Run(rootDir)
+	if _, err := os.Stat(projectDir); !os.IsNotExist(err) {
+		panic(err)
+	}
 
 	internal.Remotes(rootDir)
 }
