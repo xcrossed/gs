@@ -25,12 +25,13 @@ const help = `command:
 var springProject = regexp.MustCompile("spring-.*")
 var starterProject = regexp.MustCompile("starter-.*")
 
-// validProject 项目名称是否有效
-func validProject(project string) (prefix string, _ string) {
+// validProject 项目名称是否有效，返回项目前缀、项目目录、项目名称
+func validProject(project string) (prefix string, dir string, _ string) {
 	if !springProject.MatchString(project) && !starterProject.MatchString(project) {
 		panic("error project " + project)
 	}
-	return strings.Split(project, "-")[0], project
+	prefix = strings.Split(project, "-")[0]
+	return prefix, fmt.Sprintf("%s/%s", prefix, project), project
 }
 
 // commands 命令与处理函数的映射
@@ -49,13 +50,14 @@ func arg(index int) string {
 	panic("not enough arg")
 }
 
-var project internal.ProjectXml
+// 配置文件
+var projectXml internal.ProjectXml
 
 func main() {
+	fmt.Println(help)
 
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println(help)
 			log.Println(r)
 			os.Exit(-1)
 		}
@@ -76,10 +78,22 @@ func main() {
 	// rootDir = "/Users/didi/GitHub/go-spring/go-spring"
 
 	// 加载 project.xml 配置文件
-	err = project.Read(path.Join(rootDir, "project.xml"))
+	projectFile := path.Join(rootDir, "project.xml")
+	err = projectXml.Read(projectFile)
 	if err != nil {
 		panic(err)
 	}
+
+	count := len(projectXml.Projects)
+	defer func() {
+		if count != len(projectXml.Projects) {
+			// 保存 project.xml 配置文件
+			err = projectXml.Save(projectFile)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}()
 
 	// 备份本地文件
 	internal.Zip(rootDir)
@@ -91,7 +105,7 @@ func main() {
 // pull 拉取远程项目
 func pull(rootDir string) {
 
-	prefix, project := validProject(arg(2))
+	_, dir, project := validProject(arg(2))
 	internal.SafeStash(rootDir, func() {
 
 		remotes := internal.Remotes(rootDir)
@@ -102,22 +116,23 @@ func pull(rootDir string) {
 					remove(rootDir)
 				}
 			}()
-			internal.Add(rootDir, project, prefix)
+			repository := internal.Add(rootDir, project, dir)
+			projectXml.Add(internal.Project{Name: project, Dir: dir, Url: repository})
 			add = true
 		}
 
-		internal.Sync(rootDir, project, prefix)
+		internal.Sync(rootDir, project, dir)
 	})
 }
 
 // push 推送远程项目
 func push(rootDir string) {
 
-	prefix, project := validProject(arg(2))
+	_, dir, project := validProject(arg(2))
 	internal.SafeStash(rootDir, func() {
 
 		// 将修改提交到远程项目
-		internal.Push(rootDir, project, prefix)
+		internal.Push(rootDir, project, dir)
 
 		// 由于往回合并提交数翻倍，所以去掉试试看
 		// internal.Sync(rootDir, project, prefix)
@@ -127,10 +142,10 @@ func push(rootDir string) {
 // remove 移除远程项目
 func remove(rootDir string) {
 
-	prefix, project := validProject(arg(2))
+	_, dir, project := validProject(arg(2))
 	internal.Remove(rootDir, project)
 
-	projectDir := path.Join(rootDir, prefix, project)
+	projectDir := path.Join(rootDir, dir)
 	_ = os.RemoveAll(projectDir)
 
 	if _, err := os.Stat(projectDir); !os.IsNotExist(err) {

@@ -44,21 +44,23 @@ func Remotes(rootDir string) []string {
 }
 
 // Add 添加远程项目
-func Add(rootDir, project, prefix string) {
+func Add(rootDir, project, dir string) (repository string) {
 
 	// git remote add -f spring-message https://github.com/go-spring/spring-message.git
-	repository := fmt.Sprintf("https://github.com/go-spring/%s.git", project)
+	repository = fmt.Sprintf("https://github.com/go-spring/%s.git", project)
 	cmd := NewCommand("git", "remote", "add", "-f", project, repository)
 	if _, err := cmd.Run(rootDir); err != nil {
 		panic(err)
 	}
 
 	// git subtree add --prefix=spring/spring-message spring-message master
-	prefixArg := fmt.Sprintf("--prefix=%s/%s", prefix, project)
+	prefixArg := fmt.Sprintf("--prefix=%s", dir)
 	cmd = NewCommand("git", "subtree", "add", prefixArg, project, "master", "--squash")
 	if _, err := cmd.Run(rootDir); err != nil {
 		panic(err)
 	}
+
+	return repository
 }
 
 // Remove 删除远程项目
@@ -69,9 +71,9 @@ func Remove(rootDir, project string) {
 }
 
 // Sync 同步远程项目
-func Sync(rootDir, project, prefix string) {
+func Sync(rootDir, project, dir string) {
 	// git subtree pull --prefix=spring/spring-message spring-message master
-	prefixArg := fmt.Sprintf("--prefix=%s/%s", prefix, project)
+	prefixArg := fmt.Sprintf("--prefix=%s", dir)
 	cmd := NewCommand("git", "subtree", "pull", prefixArg, project, "master", "--squash")
 	if _, err := cmd.Run(rootDir); err != nil {
 		panic(err)
@@ -79,9 +81,9 @@ func Sync(rootDir, project, prefix string) {
 }
 
 // Push 推送远程项目
-func Push(rootDir, project, prefix string) {
+func Push(rootDir, project, dir string) {
 	// git subtree push --prefix=spring/spring-message spring-message master
-	prefixArg := fmt.Sprintf("--prefix=%s/%s", prefix, project)
+	prefixArg := fmt.Sprintf("--prefix=%s", dir)
 	cmd := NewCommand("git", "subtree", "push", prefixArg, project, "master")
 	if _, err := cmd.Run(rootDir); err != nil {
 		panic(err)
