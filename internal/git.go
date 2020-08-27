@@ -102,7 +102,13 @@ func Clone(rootDir, project, repository string) (dir string) {
 
 // Release 发布远程项目
 func Release(rootDir, tag string) {
-	cmd := NewCommand("git", "push", "origin", tag)
+
+	cmd := NewCommand("git", "tag", tag)
+	if _, err := cmd.Run(rootDir); err != nil {
+		panic(err)
+	}
+
+	cmd = NewCommand("git", "push", "origin", tag)
 	if _, err := cmd.Run(rootDir); err != nil {
 		panic(err)
 	}
