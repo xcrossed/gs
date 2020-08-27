@@ -55,7 +55,7 @@ func Add(rootDir, project, prefix string) {
 
 	// git subtree add --prefix=spring/spring-message spring-message master
 	prefixArg := fmt.Sprintf("--prefix=%s/%s", prefix, project)
-	cmd = NewCommand("git", "subtree", "add", prefixArg, project, "master")
+	cmd = NewCommand("git", "subtree", "add", prefixArg, project, "master", "--squash")
 	if _, err := cmd.Run(rootDir); err != nil {
 		panic(err)
 	}
@@ -72,7 +72,7 @@ func Remove(rootDir, project string) {
 func Sync(rootDir, project, prefix string) {
 	// git subtree pull --prefix=spring/spring-message spring-message master
 	prefixArg := fmt.Sprintf("--prefix=%s/%s", prefix, project)
-	cmd := NewCommand("git", "subtree", "pull", prefixArg, project, "master")
+	cmd := NewCommand("git", "subtree", "pull", prefixArg, project, "master", "--squash")
 	if _, err := cmd.Run(rootDir); err != nil {
 		panic(err)
 	}
