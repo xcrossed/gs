@@ -49,11 +49,13 @@ func arg(index int) string {
 	panic("not enough arg")
 }
 
+var project internal.ProjectXml
+
 func main() {
-	fmt.Println(help)
 
 	defer func() {
 		if r := recover(); r != nil {
+			fmt.Println(help)
 			log.Println(r)
 			os.Exit(-1)
 		}
@@ -67,6 +69,14 @@ func main() {
 
 	// 获取工作目录
 	rootDir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	// rootDir = "/Users/didi/GitHub/go-spring/go-spring"
+
+	// 加载 project.xml 配置文件
+	err = project.Read(path.Join(rootDir, "project.xml"))
 	if err != nil {
 		panic(err)
 	}

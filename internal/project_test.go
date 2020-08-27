@@ -12,12 +12,12 @@ func TestProjectXml(t *testing.T) {
 <projects>
   <project>
     <name>spring-core</name>
-    <subtree>spring/spring-core</subtree>
+    <dir>spring/spring-core</dir>
     <url>https://github.com/go-spring/spring-core.git</url>
   </project>
   <project>
     <name>spring-boot</name>
-    <subtree>spring/spring-boot</subtree>
+    <dir>spring/spring-boot</dir>
     <url>https://github.com/go-spring/spring-boot.git</url>
   </project>
 </projects>`
@@ -26,14 +26,14 @@ func TestProjectXml(t *testing.T) {
 		XMLName: xml.Name{Space: "", Local: "projects"},
 		Projects: []Project{
 			{
-				Name:    "spring-core",
-				Subtree: "spring/spring-core",
-				Url:     "https://github.com/go-spring/spring-core.git",
+				Name: "spring-core",
+				Dir:  "spring/spring-core",
+				Url:  "https://github.com/go-spring/spring-core.git",
 			},
 			{
-				Name:    "spring-boot",
-				Subtree: "spring/spring-boot",
-				Url:     "https://github.com/go-spring/spring-boot.git",
+				Name: "spring-boot",
+				Dir:  "spring/spring-boot",
+				Url:  "https://github.com/go-spring/spring-boot.git",
 			},
 		},
 	}
