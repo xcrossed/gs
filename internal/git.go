@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"path"
 	"strings"
 )
 
@@ -85,6 +86,23 @@ func Push(rootDir, project, dir string) {
 	// git subtree push --prefix=spring/spring-message spring-message master
 	prefixArg := fmt.Sprintf("--prefix=%s", dir)
 	cmd := NewCommand("git", "subtree", "push", prefixArg, project, "master")
+	if _, err := cmd.Run(rootDir); err != nil {
+		panic(err)
+	}
+}
+
+// Clone 克隆远程项目
+func Clone(rootDir, project, repository string) (dir string) {
+	cmd := NewCommand("git", "clone", repository)
+	if _, err := cmd.Run(rootDir); err != nil {
+		panic(err)
+	}
+	return path.Join(rootDir, project)
+}
+
+// Release 发布远程项目
+func Release(rootDir, tag string) {
+	cmd := NewCommand("git", "push", "origin", tag)
 	if _, err := cmd.Run(rootDir); err != nil {
 		panic(err)
 	}

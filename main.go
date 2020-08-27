@@ -7,6 +7,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/go-spring/gs/internal"
 )
@@ -34,12 +35,17 @@ func validProject(project string) (prefix string, dir string, _ string) {
 	return prefix, fmt.Sprintf("%s/%s", prefix, project), project
 }
 
+type Command struct {
+	backup bool // 是否需要备份
+	fn     func(rootDir string)
+}
+
 // commands 命令与处理函数的映射
-var commands = map[string]func(rootDir string){
-	"pull":    pull,    // 拉取单个远程项目
-	"push":    push,    // 推送单个远程项目
-	"remove":  remove,  // 移除单个远程项目
-	"release": release, // 发布所有远程项目
+var commands = map[string]Command{
+	"pull":    {backup: true, fn: pull},     // 拉取单个远程项目
+	"push":    {backup: true, fn: push},     // 推送单个远程项目
+	"remove":  {backup: true, fn: remove},   // 移除单个远程项目
+	"release": {backup: false, fn: release}, // 发布所有远程项目
 }
 
 // arg 获取命令行参数
@@ -64,7 +70,7 @@ func main() {
 	}()
 
 	command := arg(1)
-	fn, ok := commands[command]
+	cmd, ok := commands[command]
 	if !ok {
 		panic("error command " + command)
 	}
@@ -74,8 +80,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	// rootDir = "/Users/didi/GitHub/go-spring/go-spring"
 
 	// 加载 project.xml 配置文件
 	projectFile := path.Join(rootDir, "project.xml")
@@ -96,10 +100,12 @@ func main() {
 	}()
 
 	// 备份本地文件
-	internal.Zip(rootDir)
+	if cmd.backup {
+		internal.Zip(rootDir)
+	}
 
 	// 执行命令
-	fn(rootDir)
+	cmd.fn(rootDir)
 }
 
 // pull 拉取远程项目
@@ -131,11 +137,8 @@ func push(rootDir string) {
 	_, dir, project := validProject(arg(2))
 	internal.SafeStash(rootDir, func() {
 
-		// 将修改提交到远程项目
+		// 将修改提交到远程项目，不需要往回合并
 		internal.Push(rootDir, project, dir)
-
-		// 由于往回合并提交数翻倍，所以去掉试试看
-		// internal.Sync(rootDir, project, prefix)
 	})
 }
 
@@ -159,5 +162,18 @@ func remove(rootDir string) {
 // release 发布所有远程项目
 func release(rootDir string) {
 	tag := arg(2)
-	fmt.Println(rootDir, tag)
+
+	// 创建临时目录
+	now := time.Now().Format("20060102150405")
+	buildDir := path.Join(rootDir, "..", "go-spring-build-"+now)
+	err := os.MkdirAll(buildDir, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+
+	// 遍历所有项目，推送远程标签
+	for _, project := range projectXml.Projects {
+		projectDir := internal.Clone(buildDir, project.Name, project.Url)
+		internal.Release(projectDir, tag)
+	}
 }
