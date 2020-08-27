@@ -152,6 +152,7 @@ func remove(rootDir string) {
 		panic(err)
 	}
 
+	projectXml.Remove(project)
 	internal.Remotes(rootDir)
 }
 

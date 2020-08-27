@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -20,6 +21,22 @@ type ProjectXml struct {
 // Add 添加一个项目
 func (p *ProjectXml) Add(project Project) {
 	p.Projects = append(p.Projects, project)
+}
+
+// Remove 移除一个项目
+func (p *ProjectXml) Remove(project string) {
+	index := -1
+	for i := 0; i < len(p.Projects); i++ {
+		if p.Projects[i].Name == project {
+			index = i
+			break
+		}
+	}
+	if index >= 0 {
+		projects := append(p.Projects[:index], p.Projects[index+1:]...)
+		fmt.Println(projects)
+		p.Projects = projects
+	}
 }
 
 // Read 读取配置文件
