@@ -113,3 +113,11 @@ func Release(rootDir, tag string) {
 		panic(err)
 	}
 }
+
+// Commit 提交项目修改
+func Commit(rootDir, msg string) {
+	cmd := NewCommand("git", "commit", "-am", "\""+msg+"\"")
+	if _, err := cmd.Run(rootDir); err != nil {
+		panic(err)
+	}
+}
