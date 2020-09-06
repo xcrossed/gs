@@ -21,7 +21,7 @@ func SafeStash(rootDir string, fn func()) {
 func stashIn(rootDir string) bool {
 	// git stash
 	cmd := NewCommand("git", "stash")
-	_, err := cmd.Run(rootDir)
+	err := cmd.RunOnConsole(rootDir)
 	return err == nil
 }
 
@@ -29,14 +29,14 @@ func stashIn(rootDir string) bool {
 func stashOut(rootDir string) {
 	// git stash pop stash@{0}
 	cmd := NewCommand("git", "stash", "pop", "stash@{0}")
-	_, _ = cmd.Run(rootDir)
+	_ = cmd.RunOnConsole(rootDir)
 }
 
 // Remotes 返回远程项目列表
 func Remotes(rootDir string) []string {
 	// git remote
 	cmd := NewCommand("git", "remote")
-	if r, err := cmd.Run(rootDir); err == nil {
+	if r, err := cmd.RunOnBuffer(rootDir); err == nil {
 		ss := strings.Split(r, "\n")
 		return ss[:len(ss)-1]
 	} else {
@@ -50,14 +50,14 @@ func Add(rootDir, project, dir string) (repository string) {
 	// git remote add -f spring-message https://github.com/go-spring/spring-message.git
 	repository = fmt.Sprintf("https://github.com/go-spring/%s.git", project)
 	cmd := NewCommand("git", "remote", "add", "-f", project, repository)
-	if _, err := cmd.Run(rootDir); err != nil {
+	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 
 	// git subtree add --prefix=spring/spring-message spring-message master
 	prefixArg := fmt.Sprintf("--prefix=%s", dir)
 	cmd = NewCommand("git", "subtree", "add", prefixArg, project, "master", "--squash")
-	if _, err := cmd.Run(rootDir); err != nil {
+	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 
@@ -68,7 +68,7 @@ func Add(rootDir, project, dir string) (repository string) {
 func Remove(rootDir, project string) {
 	// git remote remove spring-message
 	cmd := NewCommand("git", "remote", "remove", project)
-	_, _ = cmd.Run(rootDir)
+	_ = cmd.RunOnConsole(rootDir)
 }
 
 // Sync 同步远程项目
@@ -76,7 +76,7 @@ func Sync(rootDir, project, dir string) {
 	// git subtree pull --prefix=spring/spring-message spring-message master
 	prefixArg := fmt.Sprintf("--prefix=%s", dir)
 	cmd := NewCommand("git", "subtree", "pull", prefixArg, project, "master", "--squash")
-	if _, err := cmd.Run(rootDir); err != nil {
+	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 }
@@ -86,7 +86,7 @@ func Push(rootDir, project, dir string) {
 	// git subtree push --prefix=spring/spring-message spring-message master
 	prefixArg := fmt.Sprintf("--prefix=%s", dir)
 	cmd := NewCommand("git", "subtree", "push", prefixArg, project, "master")
-	if _, err := cmd.Run(rootDir); err != nil {
+	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 }
@@ -94,7 +94,7 @@ func Push(rootDir, project, dir string) {
 // Clone 克隆远程项目
 func Clone(rootDir, project, repository string) (dir string) {
 	cmd := NewCommand("git", "clone", repository)
-	if _, err := cmd.Run(rootDir); err != nil {
+	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 	return path.Join(rootDir, project)
@@ -104,12 +104,12 @@ func Clone(rootDir, project, repository string) (dir string) {
 func Release(rootDir, tag string) {
 
 	cmd := NewCommand("git", "tag", tag)
-	if _, err := cmd.Run(rootDir); err != nil {
+	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 
 	cmd = NewCommand("git", "push", "origin", tag)
-	if _, err := cmd.Run(rootDir); err != nil {
+	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 }
@@ -117,7 +117,7 @@ func Release(rootDir, tag string) {
 // Commit 提交项目修改
 func Commit(rootDir, msg string) {
 	cmd := NewCommand("git", "commit", "-am", "\""+msg+"\"")
-	if _, err := cmd.Run(rootDir); err != nil {
+	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 }

@@ -12,8 +12,8 @@ func Zip(rootDir string) {
 	baseName := path.Base(rootDir)
 	now := time.Now().Format("20060102150405")
 	zipFile := fmt.Sprintf("%s-%s.zip", baseName, now)
-	cmd := NewCommand("zip", "-qr", zipFile, "./"+baseName)
-	if _, err := cmd.Run(backupDir); err != nil {
+	cmd := NewCommand("zip", "-qr", "-x=*/vendor/*", zipFile, "./"+baseName)
+	if err := cmd.RunOnConsole(backupDir); err != nil {
 		panic(err)
 	}
 }

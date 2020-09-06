@@ -1,7 +1,9 @@
 package internal
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
 )
 
@@ -14,10 +16,21 @@ func NewCommand(cmd string, args ...string) Command {
 }
 
 // Run 执行 os 命令行
-func (cmd Command) Run(workDir string) (string, error) {
+func (cmd Command) RunOnBuffer(workDir string) (string, error) {
 	c := exec.Command(cmd[0], cmd[1:]...)
 	c.Dir = workDir
 	logBuf, err := c.CombinedOutput()
 	log.Print(append([]string{workDir}, cmd...), " output:\n", string(logBuf))
 	return string(logBuf), err
+}
+
+// Run 执行 os 命令行
+func (cmd Command) RunOnConsole(workDir string) error {
+	fmt.Println(append([]string{workDir}, cmd...))
+	c := exec.Command(cmd[0], cmd[1:]...)
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Stdin = os.Stdin
+	c.Dir = workDir
+	return c.Run()
 }

@@ -48,10 +48,11 @@ type Command struct {
 
 // commands 命令与处理函数的映射
 var commands = map[string]Command{
-	"pull":    {backup: true, fn: pull},     // 拉取单个远程项目
-	"push":    {backup: true, fn: push},     // 推送单个远程项目
-	"remove":  {backup: true, fn: remove},   // 移除单个远程项目
-	"release": {backup: false, fn: release}, // 发布所有远程项目
+	"pull":    {backup: true, fn: pull},    // 拉取单个远程项目
+	"push":    {backup: true, fn: push},    // 推送单个远程项目
+	"remove":  {backup: true, fn: remove},  // 移除单个远程项目
+	"release": {backup: true, fn: release}, // 发布所有远程项目
+	"backup":  {backup: true, fn: nil},     // 备份本地项目文件
 }
 
 // arg 获取命令行参数
@@ -105,13 +106,21 @@ func main() {
 		}
 	}()
 
+	fmt.Print(os.Args, " 输入 Yes 执行该命令: ")
+	input, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+	if strings.TrimSpace(input) != "Yes" {
+		os.Exit(-1)
+	}
+
 	// 备份本地文件
 	if cmd.backup {
 		internal.Zip(rootDir)
 	}
 
 	// 执行命令
-	cmd.fn(rootDir)
+	if cmd.fn != nil {
+		cmd.fn(rootDir)
+	}
 }
 
 // pull 拉取远程项目
