@@ -24,7 +24,7 @@ func init() {
 
 // help 展示命令行用法
 const help = `command:
-  gs pull spring-*/starter-*
+  gs pull spring-*/starter-* [branch]
   gs push spring-*/starter-*
   gs remove spring-*/starter-*
   gs release tag`
@@ -68,6 +68,7 @@ var projectXml internal.ProjectXml
 
 func main() {
 	fmt.Println(help)
+	defer func() { fmt.Println() }()
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -129,6 +130,11 @@ func pull(rootDir string) {
 	_, dir, project := validProject(arg(2))
 	internal.SafeStash(rootDir, func() {
 
+		branch := "main"
+		if len(os.Args) > 3 {
+			branch = os.Args[3]
+		}
+
 		remotes := internal.Remotes(rootDir)
 		if internal.ContainsString(remotes, project) < 0 {
 			add := false
@@ -137,12 +143,17 @@ func pull(rootDir string) {
 					remove(rootDir)
 				}
 			}()
-			repository := internal.Add(rootDir, project, dir)
-			projectXml.Add(internal.Project{Name: project, Dir: dir, Url: repository})
+			repository := internal.Add(rootDir, project, dir, branch)
+			projectXml.Add(internal.Project{
+				Name:   project,
+				Dir:    dir,
+				Url:    repository,
+				Branch: branch,
+			})
 			add = true
 		}
 
-		internal.Sync(rootDir, project, dir)
+		internal.Sync(rootDir, project, dir, branch)
 	})
 }
 
@@ -153,7 +164,9 @@ func push(rootDir string) {
 	internal.SafeStash(rootDir, func() {
 
 		// 将修改提交到远程项目，不需要往回合并
-		internal.Push(rootDir, project, dir)
+		if p, ok := projectXml.Find(project); ok {
+			internal.Push(rootDir, project, dir, p.Branch)
+		}
 	})
 }
 
@@ -238,7 +251,7 @@ func release(rootDir string) {
 	// 遍历所有项目，推送远程更新
 	for _, project := range projectXml.Projects {
 		_, dir, _ := validProject(project.Name)
-		internal.Push(rootDir, project.Name, dir)
+		internal.Push(rootDir, project.Name, dir, project.Branch)
 	}
 
 	// 创建临时目录

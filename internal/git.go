@@ -44,8 +44,8 @@ func Remotes(rootDir string) []string {
 	}
 }
 
-// Add 添加远程项目
-func Add(rootDir, project, dir string) (repository string) {
+// Add 添加远程项目，branch 默认为 main
+func Add(rootDir, project, dir, branch string) (repository string) {
 
 	// git remote add -f spring-message https://github.com/go-spring/spring-message.git
 	repository = fmt.Sprintf("https://github.com/go-spring/%s.git", project)
@@ -54,9 +54,9 @@ func Add(rootDir, project, dir string) (repository string) {
 		panic(err)
 	}
 
-	// git subtree add --prefix=spring/spring-message spring-message master
+	// git subtree add --prefix=spring/spring-message spring-message main
 	prefixArg := fmt.Sprintf("--prefix=%s", dir)
-	cmd = NewCommand("git", "subtree", "add", prefixArg, project, "master", "--squash")
+	cmd = NewCommand("git", "subtree", "add", prefixArg, project, branch, "--squash")
 	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
@@ -71,21 +71,21 @@ func Remove(rootDir, project string) {
 	_ = cmd.RunOnConsole(rootDir)
 }
 
-// Sync 同步远程项目
-func Sync(rootDir, project, dir string) {
-	// git subtree pull --prefix=spring/spring-message spring-message master
+// Sync 同步远程项目，branch 默认为 main
+func Sync(rootDir, project, dir, branch string) {
+	// git subtree pull --prefix=spring/spring-message spring-message main
 	prefixArg := fmt.Sprintf("--prefix=%s", dir)
-	cmd := NewCommand("git", "subtree", "pull", prefixArg, project, "master", "--squash")
+	cmd := NewCommand("git", "subtree", "pull", prefixArg, project, branch, "--squash")
 	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}
 }
 
-// Push 推送远程项目
-func Push(rootDir, project, dir string) {
-	// git subtree push --prefix=spring/spring-message spring-message master
+// Push 推送远程项目，branch 默认为 main
+func Push(rootDir, project, dir, branch string) {
+	// git subtree push --prefix=spring/spring-message spring-message main
 	prefixArg := fmt.Sprintf("--prefix=%s", dir)
-	cmd := NewCommand("git", "subtree", "push", prefixArg, project, "master")
+	cmd := NewCommand("git", "subtree", "push", prefixArg, project, branch)
 	if err := cmd.RunOnConsole(rootDir); err != nil {
 		panic(err)
 	}

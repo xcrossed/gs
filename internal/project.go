@@ -8,9 +8,10 @@ import (
 )
 
 type Project struct {
-	Name string `xml:"name"`
-	Dir  string `xml:"dir"`
-	Url  string `xml:"url"`
+	Name   string `xml:"name"`
+	Dir    string `xml:"dir"`
+	Url    string `xml:"url"`
+	Branch string `xml:"branch"`
 }
 
 type ProjectXml struct {
@@ -21,6 +22,16 @@ type ProjectXml struct {
 // Add 添加一个项目
 func (p *ProjectXml) Add(project Project) {
 	p.Projects = append(p.Projects, project)
+}
+
+// Find 查找一个项目，成功返回 true，失败返回 false
+func (p *ProjectXml) Find(project string) (Project, bool) {
+	for _, t := range p.Projects {
+		if t.Name == project {
+			return t, true
+		}
+	}
+	return Project{}, false
 }
 
 // Remove 移除一个项目
