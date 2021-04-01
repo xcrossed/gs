@@ -25,6 +25,7 @@ func init() {
 // help 展示命令行用法
 const help = `command:
   gs pull spring-*/starter-* [branch]
+  gs repair spring-*/starter-* [branch]
   gs push spring-*/starter-*
   gs remove spring-*/starter-*
   gs release tag`
@@ -49,6 +50,7 @@ type Command struct {
 // commands 命令与处理函数的映射
 var commands = map[string]Command{
 	"pull":    {backup: true, fn: pull},    // 拉取单个远程项目
+	"repair":  {backup: false, fn: repair}, // 拉取单个远程项目
 	"push":    {backup: true, fn: push},    // 推送单个远程项目
 	"remove":  {backup: true, fn: remove},  // 移除单个远程项目
 	"release": {backup: true, fn: release}, // 发布所有远程项目
@@ -155,6 +157,16 @@ func pull(rootDir string) {
 
 		internal.Sync(rootDir, project, dir, branch)
 	})
+}
+
+// repair 修复远程项目的链接
+func repair(rootDir string) {
+	branch := "main"
+	if len(os.Args) > 3 {
+		branch = os.Args[3]
+	}
+	_, dir, project := validProject(arg(2))
+	internal.Add(rootDir, project, dir, branch)
 }
 
 // push 推送远程项目
