@@ -1,30 +1,15 @@
 package internal
 
 import (
+	"bytes"
 	"encoding/xml"
-	"reflect"
+	"io/ioutil"
 	"testing"
 )
 
 func TestProjectXml(t *testing.T) {
 
-	result := `<?xml version="1.0" encoding="UTF-8"?>
-<projects>
-  <project>
-    <name>spring-core</name>
-    <dir>spring/spring-core</dir>
-    <url>https://github.com/go-spring/spring-core.git</url>
-    <branch>master</branch>
-  </project>
-  <project>
-    <name>spring-boot</name>
-    <dir>spring/spring-boot</dir>
-    <url>https://github.com/go-spring/spring-boot.git</url>
-    <branch>main</branch>
-  </project>
-</projects>`
-
-	doc1 := ProjectXml{
+	doc := ProjectXml{
 		XMLName: xml.Name{Space: "", Local: "projects"},
 		Projects: []Project{
 			{
@@ -42,23 +27,24 @@ func TestProjectXml(t *testing.T) {
 		},
 	}
 
-	bytes, _ := xml.MarshalIndent(doc1, "", "  ")
-	data := xml.Header + string(bytes)
-	if data != result {
-		t.Errorf("%s != %s", data, result)
+	file, _ := ioutil.TempFile("", "project")
+	_ = file.Close()
+
+	if err := doc.Save(file.Name()); err != nil {
+		panic(err)
 	}
 
-	var doc2 ProjectXml
-	_ = xml.Unmarshal([]byte(data), &doc2)
-	if !reflect.DeepEqual(doc1, doc2) {
-		t.Errorf("%v != %v", doc1, doc2)
+	b1, err := ioutil.ReadFile(file.Name())
+	if err != nil {
+		panic(err)
 	}
 
-	if _, ok := doc2.Find("spring-boot"); !ok {
-		t.Errorf("%s not found", "spring-boot")
+	b2, err := ioutil.ReadFile("testdata/result.xml")
+	if err != nil {
+		panic(err)
 	}
 
-	if _, ok := doc2.Find("dummy"); ok {
-		t.Errorf("%s not found", "dummy")
+	if !bytes.Equal(b1, b2) {
+		t.Errorf("expect %s but got %s", string(b2), string(b1))
 	}
 }

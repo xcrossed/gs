@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 )
 
 type Project struct {
@@ -65,8 +66,23 @@ func (p *ProjectXml) Read(filename string) error {
 	return xml.Unmarshal(bytes, p)
 }
 
+type projectSlice []Project
+
+func (s projectSlice) Len() int {
+	return len(s)
+}
+
+func (s projectSlice) Less(i, j int) bool {
+	return s[i].Name < s[j].Name
+}
+
+func (s projectSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
 // Save 保存配置文件
 func (p *ProjectXml) Save(filename string) error {
+	sort.Sort(projectSlice(p.Projects))
 	bytes, err := xml.MarshalIndent(p, "", "    ")
 	if err != nil {
 		return err
