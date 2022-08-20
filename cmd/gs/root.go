@@ -2,6 +2,7 @@ package gs
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"regexp"
@@ -46,6 +47,7 @@ One can use gs to add or modfiy go spring project from the terminal`,
 }
 
 func init() {
+	log.SetFlags(log.Lshortfile)
 	rootCmd.PersistentFlags().BoolP("backup", "b", true, "backup project code.")
 	// rootCmd.CompletionOptions.DisableNoDescFlag = true
 	// rootCmd.CompletionOptions.DisableDescriptions = true
