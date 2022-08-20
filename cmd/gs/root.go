@@ -47,6 +47,8 @@ One can use gs to add or modfiy go spring project from the terminal`,
 
 func init() {
 	rootCmd.PersistentFlags().BoolP("backup", "b", true, "backup project code.")
+	// rootCmd.CompletionOptions.DisableNoDescFlag = true
+	// rootCmd.CompletionOptions.DisableDescriptions = true
 }
 
 func prepare() {
