@@ -1,0 +1,3 @@
+package gs
+
+var rootCmd

@@ -16,5 +16,5 @@ var backpupCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(backpupCmd)
+	rootCmd.AddCommand(reverseCmd)
 }

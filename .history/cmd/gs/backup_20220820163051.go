@@ -1,20 +1,22 @@
 package gs
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
 var backpupCmd = &cobra.Command{
 	Use:     "backup",
 	Aliases: []string{"rev"},
-	Short:   "backup a project",
+	Short:   "Reverses a string",
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// res := stringer.Reverse(args[0])
-		// fmt.Println(res)
+		fmt.Println(res)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(backpupCmd)
+	rootCmd.AddCommand(reverseCmd)
 }
