@@ -41,7 +41,6 @@ var rootCmd = &cobra.Command{
 One can use gs to add or modfiy go spring project from the terminal`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// todo
 	},
 }
 

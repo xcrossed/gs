@@ -14,15 +14,11 @@ var pullCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName := args[0]
-		branch := args[1]
-		if branch == "" {
-			branch = "main"
-		}
 		rootDir, err := os.Getwd()
 		if err != nil {
 			panic(err)
 		}
-		pull(rootDir, projectName, branch)
+		pull(rootDir, projectName)
 	},
 }
 
@@ -31,9 +27,15 @@ func init() {
 }
 
 // pull 拉取远程项目
-func pull(rootDir string, projectName string, branch string) {
+func pull(rootDir string, projectName string) {
 	_, dir, project := validProject(projectName)
 	internal.SafeStash(rootDir, func() {
+
+		branch := "main"
+		if len(os.Args) > 3 {
+			branch = os.Args[3]
+		}
+
 		remotes := internal.Remotes(rootDir)
 		if internal.ContainsString(remotes, project) < 0 {
 			add := false
@@ -51,6 +53,7 @@ func pull(rootDir string, projectName string, branch string) {
 			})
 			add = true
 		}
+
 		internal.Sync(rootDir, project, dir, branch)
 	})
 }

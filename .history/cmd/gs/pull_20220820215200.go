@@ -34,6 +34,12 @@ func init() {
 func pull(rootDir string, projectName string, branch string) {
 	_, dir, project := validProject(projectName)
 	internal.SafeStash(rootDir, func() {
+
+		// branch := "main"
+		// if len(os.Args) > 3 {
+		// 	branch = os.Args[3]
+		// }
+
 		remotes := internal.Remotes(rootDir)
 		if internal.ContainsString(remotes, project) < 0 {
 			add := false

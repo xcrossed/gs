@@ -1,8 +1,6 @@
 package gs
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +12,6 @@ var backpupCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// res := stringer.Reverse(args[0])
 		// fmt.Println(res)
-		fmt.Println("backup command.")
 	},
 }
 

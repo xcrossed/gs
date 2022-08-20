@@ -17,7 +17,7 @@ import (
 )
 
 // release 发布所有远程项目
-func release(rootDir string) {
+func release(rootDir string, tag string) {
 	tag := arg(2)
 	err := filepath.Walk(rootDir, func(walkFile string, _ os.FileInfo, err error) error {
 

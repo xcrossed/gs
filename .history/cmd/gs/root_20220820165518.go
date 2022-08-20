@@ -1,7 +1,9 @@
 package gs
 
 import (
+	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"regexp"
@@ -41,26 +43,19 @@ var rootCmd = &cobra.Command{
 One can use gs to add or modfiy go spring project from the terminal`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// todo
 	},
 }
 
 func prepare() {
 	// fmt.Println(help)
-	// defer func() { fmt.Println() }()
+	defer func() { fmt.Println() }()
 
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		log.Println(r)
-	// 		os.Exit(-1)
-	// 	}
-	// }()
-
-	// command := arg(1)
-	// cmd, ok := commands[command]
-	// if !ok {
-	// 	panic("error command " + command)
-	// }
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println(r)
+			os.Exit(-1)
+		}
+	}()
 
 	// 获取工作目录
 	rootDir, err := os.Getwd()
@@ -86,21 +81,21 @@ func prepare() {
 		}
 	}()
 
-	// fmt.Print(os.Args, " 输入 Yes 执行该命令: ")
-	// input, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	// if strings.TrimSpace(input) != "Yes" {
-	// 	os.Exit(-1)
-	// }
+	fmt.Print(os.Args, " 输入 Yes 执行该命令: ")
+	input, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+	if strings.TrimSpace(input) != "Yes" {
+		os.Exit(-1)
+	}
 
 	// 备份本地文件
-	// if cmd.backup {
-	// 	internal.Zip(rootDir)
-	// }
+	if cmd.backup {
+		internal.Zip(rootDir)
+	}
 
 	// 执行命令
-	// if cmd.fn != nil {
-	// 	cmd.fn(rootDir)
-	// }
+	if cmd.fn != nil {
+		cmd.fn(rootDir)
+	}
 }
 
 func Execute() {

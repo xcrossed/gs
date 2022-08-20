@@ -2,6 +2,7 @@ package gs
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"regexp"
@@ -41,20 +42,19 @@ var rootCmd = &cobra.Command{
 One can use gs to add or modfiy go spring project from the terminal`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// todo
 	},
 }
 
 func prepare() {
 	// fmt.Println(help)
-	// defer func() { fmt.Println() }()
+	defer func() { fmt.Println() }()
 
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		log.Println(r)
-	// 		os.Exit(-1)
-	// 	}
-	// }()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println(r)
+			os.Exit(-1)
+		}
+	}()
 
 	// command := arg(1)
 	// cmd, ok := commands[command]
@@ -98,9 +98,9 @@ func prepare() {
 	// }
 
 	// 执行命令
-	// if cmd.fn != nil {
-	// 	cmd.fn(rootDir)
-	// }
+	if cmd.fn != nil {
+		cmd.fn(rootDir)
+	}
 }
 
 func Execute() {
