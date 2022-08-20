@@ -28,6 +28,13 @@ var releaseCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
+		backup, err := cmd.Flags().GetBool("backup")
+		if err != nil {
+			panic("illegal backup value,must")
+		}
+		if backup {
+			internal.Zip(rootDir)
+		}
 		release(rootDir, tag)
 	},
 }
