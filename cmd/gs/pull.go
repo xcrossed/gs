@@ -8,10 +8,10 @@ import (
 )
 
 var pullCmd = &cobra.Command{
-	Use:     "pull",
+	Use:     "pull spring-*/starter-* [branch]",
 	Aliases: []string{"pl"},
 	Short:   "pull remote code",
-	Args:    cobra.ExactArgs(1),
+	Args:    cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName := args[0]
 		branch := args[1]
@@ -21,6 +21,14 @@ var pullCmd = &cobra.Command{
 		rootDir, err := os.Getwd()
 		if err != nil {
 			panic(err)
+		}
+
+		backup, err := cmd.Flags().GetBool("backup")
+		if err != nil {
+			panic("illegal backup value,must")
+		}
+		if backup {
+			internal.Zip(rootDir)
 		}
 		pull(rootDir, projectName, branch)
 	},
@@ -39,7 +47,7 @@ func pull(rootDir string, projectName string, branch string) {
 			add := false
 			defer func() {
 				if !add {
-					remove(rootDir)
+					remove(rootDir, projectName)
 				}
 			}()
 			repository := internal.Add(rootDir, project, dir, branch)

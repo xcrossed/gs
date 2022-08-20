@@ -14,11 +14,31 @@ import (
 	"time"
 
 	"github.com/go-spring/gs/internal"
+	"github.com/spf13/cobra"
 )
 
+var releaseCmd = &cobra.Command{
+	Use:     "release tag",
+	Aliases: []string{"rs"},
+	Short:   "release tag",
+	Args:    cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		tag := args[0]
+		rootDir, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		release(rootDir, tag)
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(releaseCmd)
+}
+
 // release 发布所有远程项目
-func release(rootDir string) {
-	tag := arg(2)
+func release(rootDir string, tag string) {
+	// tag := arg(2)
 	err := filepath.Walk(rootDir, func(walkFile string, _ os.FileInfo, err error) error {
 
 		if err != nil {

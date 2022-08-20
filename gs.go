@@ -1,12 +1,8 @@
 package main
 
-import (
-	"log"
-)
-
-func init() {
-	log.SetFlags(log.Lshortfile)
-}
+// func init() {
+// 	log.SetFlags(log.Lshortfile)
+// }
 
 // help 展示命令行用法
 const help = `command:

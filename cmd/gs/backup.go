@@ -1,8 +1,9 @@
 package gs
 
 import (
-	"fmt"
+	"os"
 
+	"github.com/go-spring/gs/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -10,11 +11,13 @@ var backpupCmd = &cobra.Command{
 	Use:     "backup",
 	Aliases: []string{"bak"},
 	Short:   "backup a project",
-	Args:    cobra.ExactArgs(1),
+	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		// res := stringer.Reverse(args[0])
-		// fmt.Println(res)
-		fmt.Println("backup command.")
+		rootDir, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		internal.Zip(rootDir)
 	},
 }
 
